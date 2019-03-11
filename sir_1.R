@@ -92,7 +92,7 @@ simulation <- as.data.frame(lsoda(inits, dt, SIR, parms = parms)) # this way our
 
 attach(simulation) # this command allows you to refer to the columns of the data frame directly.
 
-plot(dt, S, type="l", col="blue", ylim=c(0,sum(inits)), main = paste("R_0=", R_0, " beta=", as.list(parms)beta, " r=", r), xlab="time", ylab="number of individuals",lwd=3)
+plot(dt, S, type="l", col="blue", ylim=c(0,sum(inits)), main = R_0, xlab="time", ylab="number of individuals",lwd=3)
 lines(dt, I, type="l", col="red",lwd=3)
 lines(dt, R, type="l", col="darkgreen",lwd=3)
 
