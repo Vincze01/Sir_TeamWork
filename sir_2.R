@@ -34,20 +34,16 @@ SIR <- function(t, x, parms){
 # Beta and r are not global variables. This means that if you type beta in R, the output will be 'beta',
 # and not its value. You have to specify that you want to use the value of beta from 'parms' to solve the ODEs.
 # Similarly, the variables of the model are taken from the vector x. This is done by the 'with' function.
-  maxi = 0
+  
   with(as.list(c(parms,x)),{
     dS <- - beta*S*I
     dI <- + beta*S*I - r*I
-    If(maxi <dI){
-    maxi = dI
-    }
     dR <- r*I         # Note: because S+I+R=constant, this equation could actually be omitted,
-                  # and R at any time point could simply be calculated as N-S-I.
+      # and R at any time point could simply be calculated as N-S-I.
     der <- c(dS, dI,dR)
     list(der)  # the output must be returned    
   }) # end of 'with'
-  # print(maxi)
-
+  
 }  # end of function definition
 
 
@@ -67,7 +63,7 @@ for(i in 1:5) {
 
 ### INITIALIZE PARAMETER SETTINGS
 
-parms <- c(beta=10^(-i), r=10^(-j+2))		# set the parameters of the model - per time unit!
+parms <- c(beta=10^(-i), r=10^(-j+2))		# set the parameters of the model
 inits <- c(S=499, I=1, R=0)		# set the initial values
 dt    <- seq(0,100,0.1)			# set the time points for evaluation
 
@@ -75,7 +71,7 @@ dt    <- seq(0,100,0.1)			# set the time points for evaluation
 N <- sum(inits)
 R_0 <- with(as.list(parms),{beta*N/r})
 print(paste("R_0 =",R_0),quote=FALSE)
-print(maxi)
+
 
 ### SIMULATE THE MODEL
 
@@ -99,11 +95,12 @@ attach(simulation) # this command allows you to refer to the columns of the data
 plot(dt, S, type="l", col="blue", ylim=c(0,sum(inits)), main = R_0, xlab="time", ylab="number of individuals",lwd=3)
 lines(dt, I, type="l", col="red",lwd=3)
 lines(dt, R, type="l", col="darkgreen",lwd=3)
+print(unname(inits[2]))
+print(max(I))
 
 # Add a legend to the graph
 legend(70,400, legend=c("S","I","R"), col=c("blue", "red", "darkgreen"), lty=1,lwd=2)
 #dev.off()
-
 detach(simulation) # clean up the search path
 
   }
