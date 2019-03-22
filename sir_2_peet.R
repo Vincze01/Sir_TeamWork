@@ -108,16 +108,17 @@ for(i in 1:5) {
     initI = unname( inits[2])
     if(initI < max(I))
     {
-      print("NAAAAAGY")
+      print("Járvány")
     }
     else
     {
-      print("nemnagy")
+      print("Nem járvány")
     }
     
     print(paste("R_0 =",R_0),quote=FALSE)
     print(unname( inits[2]))
     print(max(I))
+    print("==================================")
     
     # Add a legend to the graph
     legend(70,400, legend=c("S","I","R"), col=c("blue", "red", "darkgreen"), lty=1,lwd=2)
