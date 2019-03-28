@@ -56,11 +56,13 @@ SIR <- function(t, x, parms){
 #load R library for ordinary differential equation solvers
 library(deSolve)
 
-#For loop to try different Beta and r values
-matrix1 = matrix(ncol=i, nrow=j)
+imax = 5
+jmax = 5
+Imatrix = matrix(nrow = imax, ncol = jmax)
 index = 0
-for(i in 1:5) {
-  for(j in 1:5) {
+#For loop to try different Beta and r values
+for(i in 1:imax) {
+  for(j in 1:jmax) {
     
     index = index + 1
     
@@ -132,12 +134,12 @@ for(i in 1:5) {
     if(initI < max(I))
     {
       print("J?rv?ny")
-      matrix1[i,j] = T
+      Imatrix[i,j] = T
     }
     else
     {
       print("Nem j?rv?ny")
-      matrix1[i,j] = F
+      Imatrix[i, j] = F
     }
     
     print(paste("R_0 =",R_0),quote=FALSE)
@@ -149,8 +151,5 @@ for(i in 1:5) {
     
   }
 }
-print(matrix1)
- #[j,i]
-#?matrix
-#M <- matrix(data=1:25,nrow=5, ncol=5)
-#print (M)
+print(Imatrix)
+
