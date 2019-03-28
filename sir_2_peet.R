@@ -44,7 +44,6 @@ SIR <- function(t, x, parms){
     der <- c(dS, dI,dR)
     list(der)  # the output must be returned    
   }) # end of 'with'
-  # print(maxi)
   
 }  # end of function definition
 
