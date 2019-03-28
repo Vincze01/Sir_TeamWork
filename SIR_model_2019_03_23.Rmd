@@ -1,9 +1,10 @@
 ---
 title: "SIR_model"
 author: "BZsofi"
-date: '2019 m�rcius 22 '
+date: '2019 m?rcius 22 '
 output: word_document
 ---
+#szeretünkzsófi
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
