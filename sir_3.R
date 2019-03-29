@@ -56,9 +56,9 @@ SIR <- function(t, x, parms){
 #load R library for ordinary differential equation solvers
 library(deSolve)
 
-imax = 5
-jmax = 5
-Imatrix = matrix(nrow = imax, ncol = jmax)
+imax = 5 # eddig megy a betat lepteto for ciklus
+jmax = 5 # eddig megy az r-t lepteto for ciklus
+Imatrix = matrix(nrow = imax, ncol = jmax) # ebben a matrixban forog vizsgalni, hogy I max erteke nagyobb-e mint a kezdeti
 index = 0
 #For loop to try different Beta and r values
 for(i in 1:imax) {
@@ -130,16 +130,16 @@ for(i in 1:imax) {
     
     print(paste("index: ", index))
     
-    initI = unname( inits[2])
+    initI = unname( inits[2]) #I kezdeti erteket tarolom ebben
     if(initI < max(I))
     {
       print("J?rv?ny")
-      Imatrix[i,j] = T
+      Imatrix[i,j] = T # ha a a fertozottek szama tud noni, akkor TRUE lesz a matrix i;j eleme
     }
     else
     {
       print("Nem j?rv?ny")
-      Imatrix[i, j] = F
+      Imatrix[i, j] = F # ha nem tud noni a fertozottek szama, FALSE lesz
     }
     
     print(paste("R_0 =",R_0),quote=FALSE)
