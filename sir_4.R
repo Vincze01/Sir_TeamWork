@@ -60,7 +60,8 @@ library(deSolve)
 
 imax = 5 # eddig megy a betat lepteto for ciklus
 jmax = 5 # eddig megy az r-t lepteto for ciklus
-Imatrix = matrix(nrow = imax, ncol = jmax) # ebben a matrixban forog vizsgalni, hogy I max erteke nagyobb-e mint a kezdeti
+matrix1 = matrix(nrow = imax, ncol = jmax)
+matrix2 = matrix(nrow = imax, ncol = jmax) # ebben a matrixban forog vizsgalni, hogy I max erteke nagyobb-e mint a kezdeti
 index = 0
 
 for(i in 1:imax) {
