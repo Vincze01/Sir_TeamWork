@@ -172,6 +172,6 @@ if (all(matrix_R_0) == all(matrix_Imax)) {  # osszehasonlitom a ket matrixot, vi
   print("Szupika")
 }
 print(matrix_R_0 == matrix_Imax)
-identical(matrix_R_0, all matrix_Imax, num.eq = TRUE, single.NA = TRUE, attrib.as.set = TRUE,
+identical(matrix_R_0, matrix_Imax, num.eq = TRUE, single.NA = TRUE, attrib.as.set = TRUE,
           ignore.bytecode = TRUE, ignore.environment = FALSE,
           ignore.srcref = TRUE)
