@@ -61,13 +61,13 @@ for (v in 0:20) {
   index = f*100
   S0 = 499
   parms <- c(beta=1e-3, r=1e-1)		# set the parameters of the model
-  inits <- c(S=(1-f)*S0, I=1, R=0)		# set the initial values
+  inits <- c(S=(1-f)*S0, I=1, R=f*S0)		# set the initial values
   dt    <- seq(0,100,0.1)			# set the time points for evaluation
 
 
   # Calculate and print R_0 on the screen
   N <- sum(inits)
-  R_0 <- with(as.list(parms),{beta*N/r})
+  R_0 <- with(as.list(parms),{beta*(N-f*S0)/r})
   print(paste("hany szazalek oltott", index))
   print(paste("R_0 =",R_0),quote=FALSE)
 
