@@ -137,22 +137,22 @@ for(i in 1:imax) {
     initI = unname( inits[2])
     if(initI < max(I))
     {
-      matrix_R_0[i,j] = T # ha a a fertozottek szama tud noni, akkor TRUE lesz a matrix i;j eleme
+      matrix_Imax[i,j] = T # ha a a fertozottek szama tud noni, akkor TRUE lesz a matrix i;j eleme
     }
     else
     {
-      matrix_R_0[i,j] = F  # ha nem tud noni a fertozottek szama, FALSE lesz
+      matrix_Imax[i,j] = F  # ha nem tud noni a fertozottek szama, FALSE lesz
     }
   
     if(((beta*(S[1]+I[1]+R[1]))/r) > 1) # az if nem tudja kezelni, hogy S, I és R nem egy darab szám, hanem változik a szimuláció során, ezért megkértem, hogy a kezdeti értékkel számoljon
     {
       print("Jarvany")
-      matrix_Imax[i,j] = T  # ha R_0 nagyobb 1-nél, akkor a mátrix i;j eleme igaz lesz
+      matrix_R_0[i,j] = T  # ha R_0 nagyobb 1-nél, akkor a mátrix i;j eleme igaz lesz
     }
     else
     {
       print("Nem jarvany")
-      matrix_Imax[i,j] = F # ha R_0 nem nagyobb 1-nél, akkor a mátrix i;j eleme hamis lesz
+      matrix_R_0[i,j] = F # ha R_0 nem nagyobb 1-nél, akkor a mátrix i;j eleme hamis lesz
     }
     print(paste("R_0 =",R_0),quote=FALSE)
     # print(unname( inits[2]))
@@ -171,3 +171,7 @@ print(matrix_Imax)
 if (all(matrix_R_0) == all(matrix_Imax)) {  # osszehasonlitom a ket matrixot, viszont az if nem hajlando matrixot kezelni csak ugy
   print("Szupika")
 }
+print(matrix_R_0 == matrix_Imax)
+identical(matrix_R_0, all matrix_Imax, num.eq = TRUE, single.NA = TRUE, attrib.as.set = TRUE,
+          ignore.bytecode = TRUE, ignore.environment = FALSE,
+          ignore.srcref = TRUE)
