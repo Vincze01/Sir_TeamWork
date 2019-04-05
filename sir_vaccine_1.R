@@ -56,42 +56,48 @@ SIR <- function(t, x, parms){
 library(deSolve)
 
 ### INITIALIZE PARAMETER SETTINGS
-
-parms <- c(beta=1e-3, r=1e-1)		# set the parameters of the model
-inits <- c(S=499, I=1, R=0)		# set the initial values
-dt    <- seq(0,100,0.1)			# set the time points for evaluation
-
-# Calculate and print R_0 on the screen
-N <- sum(inits)
-R_0 <- with(as.list(parms),{beta*N/r})
-print(paste("R_0 =",R_0),quote=FALSE)
+for (v in 0:20) {
+  f = v/20
+  index = f*100
+  S0 = 499
+  parms <- c(beta=1e-3, r=1e-1)		# set the parameters of the model
+  inits <- c(S=(1-f)*S0, I=1, R=0)		# set the initial values
+  dt    <- seq(0,100,0.1)			# set the time points for evaluation
 
 
-### SIMULATE THE MODEL
+  # Calculate and print R_0 on the screen
+  N <- sum(inits)
+  R_0 <- with(as.list(parms),{beta*N/r})
+  print(paste("hany szazalek oltott", index))
+  print(paste("R_0 =",R_0),quote=FALSE)
 
-## Use lsoda to solve the differential equations numerically. The syntax should be
-## lsoda(initial values, time points, function, parameters)
 
-simulation <- as.data.frame(lsoda(inits, dt, SIR, parms=parms)) # this way our set 'parms' will be used as default
+  ### SIMULATE THE MODEL
 
-### PLOT THE OUTPUT
+  ## Use lsoda to solve the differential equations numerically. The syntax should be
+  ## lsoda(initial values, time points, function, parameters)
 
-# If you remove the # before pdf(...) and dev.off(), the output will be written in a pdf file,
-# in the working directory. If you don't, a window containing your graph will just pop up.
+  simulation <- as.data.frame(lsoda(inits, dt, SIR, parms=parms)) # this way our set 'parms' will be used as default
 
-#pdf("startingscript.pdf")
-#par(cex=1.7)
-# Plot S according to time, in blue, and add the graph I and R according to time,
-# in red and dark green respectively. Call help(plot) for further details.
+  ### PLOT THE OUTPUT
 
-attach(simulation) # this command allows you to refer to the columns of the data frame directly.
+  # If you remove the # before pdf(...) and dev.off(), the output will be written in a pdf file,
+  # in the working directory. If you don't, a window containing your graph will just pop up.
 
-plot(dt, S, type="l", col="blue", ylim=c(0,sum(inits)), main = R_0, xlab="time", ylab="number of individuals",lwd=3)
-lines(dt, I, type="l", col="red",lwd=3)
-lines(dt, R, type="l", col="darkgreen",lwd=3)
+  #pdf("startingscript.pdf")
+  #par(cex=1.7)
+  # Plot S according to time, in blue, and add the graph I and R according to time,
+  # in red and dark green respectively. Call help(plot) for further details.
 
-# Add a legend to the graph
-legend(70,400, legend=c("S","I","R"), col=c("blue", "red", "darkgreen"), lty=1,lwd=2)
-#dev.off()
+  attach(simulation) # this command allows you to refer to the columns of the data frame directly.
 
-detach(simulation) # clean up the search path
+  plot(dt, S, type="l", col="blue", ylim=c(0,sum(inits)), main = R_0, xlab="time", ylab="number of individuals",lwd=3)
+  lines(dt, I, type="l", col="red",lwd=3)
+  lines(dt, R, type="l", col="darkgreen",lwd=3)
+
+  # Add a legend to the graph
+  legend(70,400, legend=c("S","I","R"), col=c("blue", "red", "darkgreen"), lty=1,lwd=2)
+  #dev.off()
+
+  detach(simulation) # clean up the search path
+}
