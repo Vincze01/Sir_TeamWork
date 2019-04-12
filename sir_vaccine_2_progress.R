@@ -55,7 +55,6 @@ SIR <- function(t, x, parms){
 #load R library for ordinary differential equation solvers
 library(deSolve)
 R0_vektor = vector(mode="list") #ez lesz amiben az R0-okat tárolom
-names(R0_vektor) = c() #ez lesz, ahol az R0oknak neve lesz
 ### INITIALIZE PARAMETER SETTINGS
 for (v in 1:21) {
   f = (v-1)/20
@@ -72,7 +71,7 @@ for (v in 1:21) {
   print(paste("hany szazalek oltott", index))
   print(paste("R_0 =",R_0),quote=FALSE)
   R0_vektor[v] = (R_0) #a vektor/lista/kisfaszom v-edik eleme legyen az aktualis R0 ertek
-  names(R0_vektor[v]) = f*100 #a vektor/lista/kisfaszom v-edik elemenek a neve legyen az oltottsagi %
+  names(R0_vektor)[v] = f*100 #a vektor/lista/kisfaszom v-edik elemenek a neve legyen az oltottsagi %
 
 
   ### SIMULATE THE MODEL
@@ -103,4 +102,10 @@ for (v in 1:21) {
   #dev.off()
 
   detach(simulation) # clean up the search path
+}
+print(R0_vektor)
+for (a in 1:length(R0_vektor)) {
+  if (R0_vektor[a] < 1) {
+    print(names(R0_vektor)[a])
+  }
 }
