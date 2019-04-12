@@ -54,7 +54,7 @@ SIR <- function(t, x, parms){
 ### LOAD LIBRARIES
 #load R library for ordinary differential equation solvers
 library(deSolve)
-R0_vektor = c()
+R0_vektor = vector(mode="list")
 ### INITIALIZE PARAMETER SETTINGS
 for (v in 0:20) {
   f = v/20
@@ -70,6 +70,8 @@ for (v in 0:20) {
   R_0 <- with(as.list(parms),{beta*(N-f*S0)/r})
   print(paste("hany szazalek oltott", index))
   print(paste("R_0 =",R_0),quote=FALSE)
+  R0_vektor[v] = (R_0)
+  names(R0_vektor[v]) = f*100
 
 
   ### SIMULATE THE MODEL
@@ -101,3 +103,4 @@ for (v in 0:20) {
 
   detach(simulation) # clean up the search path
 }
+print(R0_vektor)
