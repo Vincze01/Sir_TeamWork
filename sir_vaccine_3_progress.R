@@ -54,13 +54,16 @@ SIR <- function(t, x, parms){
 ### LOAD LIBRARIES
 #load R library for ordinary differential equation solvers
 library(deSolve)
+imax = 3
+for(i in 1:imax){
+  
 R0_vektor = vector(mode="list") #ez lesz amiben az R0-okat tárolom
 ### INITIALIZE PARAMETER SETTINGS
 for (v in 1:21) {
   f = (v-1)/20
   index = f*100
   S0 = 499
-  parms <- c(beta=1e-3, r=1e-1)		# set the parameters of the model
+  parms <- c(beta=10^(-i), r=1e-1)		# set the parameters of the model
   inits <- c(S=(1-f)*S0, I=1, R=f*S0)		# set the initial values
   dt    <- seq(0,100,0.1)			# set the time points for evaluation
 
@@ -68,8 +71,8 @@ for (v in 1:21) {
   # Calculate and print R_0 on the screen
   N <- sum(inits)
   R_0 <- with(as.list(parms),{beta*(N-f*S0)/r})
-  print(paste("hany szazalek oltott", index))
-  print(paste("R_0 =",R_0),quote=FALSE)
+  # print(paste("hany szazalek oltott", index))
+  # print(paste("R_0 =",R_0),quote=FALSE)
   R0_vektor[v] = (R_0) #a vektor/lista/kisfaszom v-edik eleme legyen az aktualis R0 ertek
   names(R0_vektor)[v] = f*100 #a vektor/lista/kisfaszom v-edik elemenek a neve legyen az oltottsagi %
 
@@ -103,10 +106,10 @@ for (v in 1:21) {
 
   detach(simulation) # clean up the search path
 }
-print(R0_vektor)
+ print(R0_vektor)
 volte = FALSE #ebben tarolom, hogy van-e olyan oltottsag, ami megelozi a jarvanyt
 for (a in 1:length(R0_vektor)) {
-  if (R0_vektor[a] < 1) {
+  if (R0_vektor[a] <= 1) {
     print(names(R0_vektor)[a])
     volte = TRUE
     break
@@ -114,4 +117,5 @@ for (a in 1:length(R0_vektor)) {
 }
 if (volte == FALSE) {
   print("Mind meg fogunk dogleni")
+}
 }
