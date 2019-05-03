@@ -36,11 +36,11 @@ SIR <- function(t, x, parms){
 # Similarly, the variables of the model are taken from the vector x. This is done by the 'with' function.
 
   with(as.list(c(parms,x)),{
-    dS <- d*(S+I+R)+g*I - beta*S*I - d*S - f*S #szuletes = halal, ezert a halalt parameterezem csak
+    dS <- d*(S+I+R)+g*I - beta*S*I - d*S - f*(d*(S+I+R)+g*I)  #szuletes = halal, ezert a halalt parameterezem csak
     # d*sig+gi a total szuletesszam, ds a S-ek halala, fS a vakcinazottak szama
     dI <- + beta*S*I - r*I - d*I -g*I
     #dI a sima halalozasi rataval halo I-k, g*I amennyivel jobban meghalnak az I-k
-    dR <- r*I - d*R + f*S        # Note: because S+I+R=constant, this equation could actually be omitted,
+    dR <- r*I - d*R + f*(d*(S+I+R)+g*I)       # Note: because S+I+R=constant, this equation could actually be omitted,
                   # and R at any time point could simply be calculated as N-S-I.
     der <- c(dS, dI, dR)
     list(der)  # the output must be returned    
@@ -48,7 +48,7 @@ SIR <- function(t, x, parms){
 
 }  # end of function definition
 
-
+### NEM JO, NEM fSt kell kivonni meg hozzáadni mindig az faszsag
 ###########################
 # MAIN PROGRAM
 ###########################
