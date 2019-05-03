@@ -42,7 +42,7 @@ SIR <- function(t, x, parms){
     #dI a sima halalozasi rataval halo I-k, g*I amennyivel jobban meghalnak az I-k
     dR <- r*I - d*R + f*S        # Note: because S+I+R=constant, this equation could actually be omitted,
                   # and R at any time point could simply be calculated as N-S-I.
-    der <- c(dS, dI,dR)
+    der <- c(dS, dI, dR)
     list(der)  # the output must be returned    
   }) # end of 'with'
 
@@ -59,20 +59,20 @@ library(deSolve)
 R0_vektor = vector(mode="list") #ez lesz amiben az R0-okat tárolom
 ### INITIALIZE PARAMETER SETTINGS
 for (v in 1:21) {
-  f = (v-1)/20
-  index = f*100
-  parms <- c(beta=1e-2, r=1e-1, d=0.1, g=2)		# set the parameters of the model
-  inits <- c(S=499, I=1, R=0)		# set the initial values
+  sajt = (v-1)/20
+  index = sajt*100
+  S0 = 499
+  parms <- c(beta=1e-2, r=1e-1, d=0.1, g=2, f = sajt)		# set the parameters of the model
+  inits <- c(S=(1-sajt)*S0, I=1, R=sajt*S0)		# set the initial values
   dt    <- seq(0,100,0.1)			# set the time points for evaluation
-
 
   # Calculate and print R_0 on the screen
   N <- sum(inits)
-  R_0 <- with(as.list(parms),{beta*(N-f*S)/r})
+  R_0 <- with(as.list(parms),{beta*(N-sajt*S0)/r})
   print(paste("hany szazalek oltott", index))
   print(paste("R_0 =",R_0),quote=FALSE)
   R0_vektor[v] = (R_0) #a vektor/lista/kisfaszom v-edik eleme legyen az aktualis R0 ertek
-  names(R0_vektor)[v] = f*100 #a vektor/lista/kisfaszom v-edik elemenek a neve legyen az oltottsagi %
+  names(R0_vektor)[v] = sajt*100 #a vektor/lista/kisfaszom v-edik elemenek a neve legyen az oltottsagi %
 
 
   ### SIMULATE THE MODEL
@@ -94,7 +94,7 @@ for (v in 1:21) {
 
   attach(simulation) # this command allows you to refer to the columns of the data frame directly.
 
-  plot(dt, S, type="l", col="blue", ylim=c(0,sum(inits)), main = R_0, xlab="time", ylab="number of individuals",lwd=3)
+  plot(dt, S, type="l", col="blue", ylim=c(0,sum(inits)), main = sajt, xlab="time", ylab="number of individuals",lwd=3)
   lines(dt, I, type="l", col="red",lwd=3)
   lines(dt, R, type="l", col="darkgreen",lwd=3)
 
