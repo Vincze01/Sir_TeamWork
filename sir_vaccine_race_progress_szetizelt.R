@@ -36,11 +36,11 @@ SIR <- function(t, x, parms){
 # Similarly, the variables of the model are taken from the vector x. This is done by the 'with' function.
 
   with(as.list(c(parms,x)),{
-    dS <- d*(S+I+R)+g*I - beta*S*I - d*S #szuletes = halal, ezert a halalt parameterezem csak
-    # d*sig+gi a total szuletesszam, ds a S-ek halala
+    dS <- d*(S+I+R)+g*I - beta*S*I - d*S - f*S #szuletes = halal, ezert a halalt parameterezem csak
+    # d*sig+gi a total szuletesszam, ds a S-ek halala, fS a vakcinazottak szama
     dI <- + beta*S*I - r*I - d*I -g*I
     #dI a sima halalozasi rataval halo I-k, g*I amennyivel jobban meghalnak az I-k
-    dR <- r*I - d*R         # Note: because S+I+R=constant, this equation could actually be omitted,
+    dR <- r*I - d*R + f*S        # Note: because S+I+R=constant, this equation could actually be omitted,
                   # and R at any time point could simply be calculated as N-S-I.
     der <- c(dS, dI,dR)
     list(der)  # the output must be returned    
@@ -61,15 +61,14 @@ R0_vektor = vector(mode="list") #ez lesz amiben az R0-okat tárolom
 for (v in 1:21) {
   f = (v-1)/20
   index = f*100
-  S0 = 499
   parms <- c(beta=1e-2, r=1e-1, d=0.1, g=2)		# set the parameters of the model
-  inits <- c(S=(1-f)*S0, I=1, R=f*S0)		# set the initial values
+  inits <- c(S=499, I=1, R=0)		# set the initial values
   dt    <- seq(0,100,0.1)			# set the time points for evaluation
 
 
   # Calculate and print R_0 on the screen
   N <- sum(inits)
-  R_0 <- with(as.list(parms),{beta*(N-f*S0)/r})
+  R_0 <- with(as.list(parms),{beta*(N-f*S)/r})
   print(paste("hany szazalek oltott", index))
   print(paste("R_0 =",R_0),quote=FALSE)
   R0_vektor[v] = (R_0) #a vektor/lista/kisfaszom v-edik eleme legyen az aktualis R0 ertek
