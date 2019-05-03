@@ -62,7 +62,7 @@ for (v in 1:21) {
   sajt = (v-1)/20
   index = sajt*100
   S0 = 499
-  parms <- c(beta=1e-2, r=1e-1, d=0.1, g=2, f = sajt)		# set the parameters of the model
+  parms <- c(beta=1e-2, r=1e-1, d=0.1, g=2, f = sajt*0.5)		# set the parameters of the model
   inits <- c(S=(1-sajt)*S0, I=1, R=sajt*S0)		# set the initial values
   dt    <- seq(0,100,0.1)			# set the time points for evaluation
 
