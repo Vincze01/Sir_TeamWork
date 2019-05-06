@@ -1,0 +1,238 @@
+---
+title: "Zsofi Project"
+author: "BZsofi"
+date: "30/04/2019"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE, fig.align='center', fig.height=10, fig.width=10)
+```
+
+```{r}
+##########################################################
+# Starting script to the module 'SIR models of epidemics'
+##########################################################
+
+# implements the basic SIR model, and plots simulation results
+
+## Here you only need to know basic things:
+##  #	To make comments
+##  <-	Assigning a value to a symbol
+##  c	To create a vector c(v1, v2, ..., vn)
+##  e	is *10^
+##  seq(a,b,c)	To create a sequence from a to b with intervals c
+
+
+###################################
+# FUNCTION DEFINITIONS
+###################################
+
+###
+# SIR <- function(t, x, parms)
+# Use: calculates the derivatives for the SIR model
+# Input: 
+#      t: time (not used here, because there is no explicit time dependence)
+#      x: vector of the current values of all variables (S, I, R)
+#      parms: vector of all parameter values
+# Output:
+#      der: vector of derivatives
+
+# To use the lsoda function, the model function has to be a function of t (time),
+# x (the vector of the variables) and parms (the parameters of the model).
+
+SIR <- function(t, x, parms){
+
+# Beta and r are not global variables. This means that if you type beta in R, the output will be 'beta',
+# and not its value. You have to specify that you want to use the value of beta from 'parms' to solve the ODEs.
+# Similarly, the variables of the model are taken from the vector x. This is done by the 'with' function.
+  
+  with(as.list(c(parms,x)),{
+    dSm <- -beta*Sm*Im -
+      #Sm fogy, ha Sm Im-mel találkozik
+      beta*Sm*I1 -
+      #Sm fogy, ha Sm I1-gyel találkozik
+      beta2*Sm*I2 -
+      #Sm fogy, ha Sm I2-vel találkozik
+      beta*Sm*I1R2 -
+      #Sm fogy, ha Sm I1R2-vel találkozik
+      beta2*Sm*I2R1
+      #Sm fogy, ha Sm I2R1-gyel találkozik
+    dS1R2 <- +r*I2 -
+      #S1R2 nő, ha I2 felépül
+      beta*S1R2*Im -
+      #S1R2 fogy, ha S1R2 Im-mel találkozik
+      beta*S1R2*I1 -
+      #S1R2 fogy, ha S1R2 I1-gyel találkozik
+      beta*S1R2*I1R2
+      #S1R2 fogy, ha S1R2 I1R2-vel találkozik
+    dS2R1 <- +r*I1 -
+      #S2R1 nő, ha I1 felépül
+      beta*S2R1*Im -
+      #S2R1 fogy, ha S2R1 Im-mel találkozik
+      beta*S2R1*I2 -
+      #S2R1 fogy, ha S2R1 I2-vel találkozik
+      beta*S2R1*I2R1
+      #S2R1 fogy, ha S2R1 I2R1-gyel találkozik
+    dIm <- +beta*Sm*Im +
+      #Im nő, ha Im Sm-mel találkozik
+      2*beta*I1*I2 +
+      #Im nő, ha I1 I2-vel találkozik (átathatják egymásnak is, ezért a 2x szorzó)
+      beta*I2*I1R2 +
+      #Im nő, ha I2 I1R2-vel találkozik
+      beta*I1*I2R1 +
+      #Im nő, ha I1 I2R1-gyel találkozik
+      beta*I1*Im +
+      #Im nő, ha I1 Im-mel találkozik
+      beta*I2*Im -
+      #Im nő, ha I2 Im-mel találkozik
+      r*Im
+      #Im fogy, ha felépül és Rm lesz
+    dI1 <- +beta*Sm*I1 +
+      #I1 nő, ha Sm I1-gyel találkozik
+      beta*Sm*I1R2 -
+      #I1 nő, ha Sm I1R2-vel találkozik
+      beta*I1*I2 -
+      #I1 fogy, ha I1 I2-vel találkozik és Im lesz
+      beta*I1*I2R1 -
+      #I1 fogy, ha I1 I2R1-gyel találkozik és Im lesz
+      beta*I1*Im -
+      #I1 fogy, ha I1 Im-mel találkozik és Im lesz
+      r*I1
+      #I1 fogy, ha felépül
+    dI2 <- +beta2*Sm*I2 +
+      #I2 nő, ha Sm I2-vel találkozik
+      beta2*Sm*I2R1 -
+      #I2 nő, ha Sm I2R1-gyel találkozik
+      beta*I1*I2 -
+      #I2 fogy, ha I2 I1-gyel találkozik és Im lesz
+      beta*I2*I1R2 -
+      #I2 fogy, ha I2 I1R2-vel találkozik és Im lesz
+      beta*I2*Im -
+      #I2 fogy, ha I2 Im-mel találkozik és Im lesz
+      r*I2
+      #I2 fogy, ha felépül
+    dI1R2 <- +beta*S1R2*I1 +
+      #I1R2 nő, ha S1R2 I1-gyel találkozik
+      beta*S1R2*I1R2 +
+      #I1R2 nő, ha S1R2 I1R2-vel találkozik
+      beta*S1R2*Im -
+      #I1R2 nő, ha S1R2 Im-mel találkozik
+      r*I1R2
+      #I1R2 csökken, ha felépül
+    dI2R1 <- +beta*S2R1*I2 +
+      #I2R1 nő, ha S2R1 I2-vel találkozik
+      beta*S2R1*I2R1 +
+      #I2R1 nő, ha S2R1 I2R1-gyel találkozik
+      beta*S2R1*Im -
+      #I2R1 nő, ha S2R1 Im-mel találkozik
+      r*I2R1
+      #I2R1 csökken, ha felépül
+    dRm <- +r*Im +
+      #Rm nő, ha Im felépül
+      r*I1R2 +
+      #Rm nő, ha I1R2 felépül
+      r*I2R1
+      #Rm nő, ha I2R1 felépül
+    
+    # Note: because S+I+R=constant, this equation could actually be omitted,
+    # and R at any time point could simply be calculated as N-S-I.
+    der <- c(dSm, dS1R2, dS2R1, dIm, dI1, dI2, dI1R2, dI2R1, dRm)
+    list(der)  # the output must be returned    
+  }) # end of 'with'
+
+}  # end of function definition
+
+
+###########################
+# MAIN PROGRAM
+###########################
+
+### LOAD LIBRARIES
+#load R library for ordinary differential equation solvers
+library(deSolve)
+
+### INITIALIZE PARAMETER SETTINGS
+parms <- # set the parameters of the model
+        c(beta=0.001,
+          beta2=0.00001,
+          r=0.01)
+inits <- # set the initial values
+        c(Sm=498,
+          S1R2=0,
+          S2R1=0,
+          Im=0,
+          I1=1,
+          I2=1,
+          I1R2=0,
+          I2R1=0,
+          Rm=0)
+dt    <- # set the time points for evaluation
+        seq(0,100,0.1)
+
+N <- sum(inits)
+R_0 <- with(as.list(parms),{beta*N/r})
+
+### SIMULATE THE MODEL
+
+## Use lsoda to solve the differential equations numerically. The syntax should be
+## lsoda(initial values, time points, function, parameters)
+
+simulation <- as.data.frame(lsoda(inits, dt, SIR, parms=parms)) # this way our set 'parms' will be used as default
+
+### PLOT THE OUTPUT
+
+# If you remove the # before pdf(...) and dev.off(), the output will be written in a pdf file,
+# in the working directory. If you don't, a window containing your graph will just pop up.
+
+#pdf("startingscript.pdf")
+#par(cex=1.7)
+# Plot S according to time, in blue, and add the graph I and R according to time,
+# in red and dark green respectively. Call help(plot) for further details.
+
+library(ggplot2)
+
+#itt írom be, hogy kiírja nekem a beta-kat meg r-eket is a plotra
+rval = paste("R0 = ",R_0, sep = "")
+beta = parms[1]
+beta2 = parms[2]
+r = parms[3]
+beta3 = paste("beta = ",beta, sep = "")
+beta4 = paste("beta2 = ",beta2, sep = "")
+r2 = paste("r = ",r,sep = "")
+title = paste(rval,beta3,beta4,r2, sep = ", ")
+
+#plot script
+plot = ggplot(simulation, aes(x = time)) + 
+  geom_line(aes(y = Sm, colour = "Sm"), size=2, alpha=1) + 
+  geom_line(aes(y = S1R2, colour = "S1R2"), size=2, alpha=1) + 
+  geom_line(linetype="dotted", aes(y = S2R1, colour = "S2R1"), size=2, alpha=1) +
+  geom_line(aes(y = Im, colour = "Im"), size=2, alpha=1) +
+  geom_line(aes(y = I1, colour = "I1"), size=2, alpha=1) +
+  geom_line(linetype="dotted", aes(y = I2, colour = "I2"), size=2, alpha=1) + 
+  geom_line(aes(y = I1R2, colour = "I1R2"), size=2, alpha=1) +
+  geom_line(linetype="dotted", aes(y = I2R1, colour = "I2R1"), size=2, alpha=1) +
+  geom_line(aes(y = Rm, colour = "Rm"), size=2, alpha=1) +
+  ylab("Number of individuals") + 
+  xlab("Time") +
+  ggtitle(title) +
+  scale_color_manual(name = " ",
+                     values = c("Sm"="darkslateblue","S1R2"="deepskyblue","S2R1"="dodgerblue4",
+                                "Im"="tomato4","I1"="sienna1","I2"="tomato3",
+                                "I1R2"="tan1","I2R1"="salmon1","Rm"="green3")) +
+  theme(plot.background = element_rect(fill = "antiquewhite4"),
+        legend.background = element_rect(fill = "antiquewhite4"),
+        plot.title = element_text(size = 18, lineheight=.8, hjust=0.5, face="bold", colour="antiquewhite"),
+        plot.subtitle = element_text(size = 16, lineheight=.8, hjust=0.5, face="italic", colour="antiquewhite"),
+        axis.title = element_text(size = 15, face="bold",colour="antiquewhite"),
+        axis.text = element_text(size = 12,colour="antiquewhite"),
+        legend.position="top",
+        legend.key = element_rect(fill = "seashell"),
+        legend.text = element_text(size = 12,colour="antiquewhite"),
+        legend.box.background = element_rect(colour = "antiquewhite", size=1.5),
+        panel.background = element_rect(fill = "seashell", colour = "seashell", size = 0.5, linetype = "solid"),
+        panel.grid.major = element_line(size = 0.5, linetype = 'solid', colour = "antiquewhite"), 
+        panel.grid.minor = element_line(size = 0.25, linetype = 'solid', colour = "antiquewhite"))
+print(plot)
+```
+
