@@ -28,6 +28,8 @@
 
 # To use the lsoda function, the model function has to be a function of t (time),
 # x (the vector of the variables) and parms (the parameters of the model).
+# oltottsági ráta = 1/időegység, teljes oltottsági ráta = oltottsági arány*1/időegység
+# felezési idő
 
 SIR <- function(t, x, parms){
 
@@ -63,7 +65,7 @@ for (v in 1:21) {
   index = f*100
   S0 = 499
   parms <- c(beta=1e-2, r=1e-1, d=0.1, g=2)		# set the parameters of the model
-  inits <- c(S=(1-f)*S0, I=1, R=f*S0)		# set the initial values
+  inits <- c(S=(1-f)*S0, I=1, R=f*S0, newBorn=c())		# set the initial values
   dt    <- seq(0,100,0.1)			# set the time points for evaluation
 
 
