@@ -38,27 +38,23 @@ SIR <- function(t, x, parms){
 # Similarly, the variables of the model are taken from the vector x. This is done by the 'with' function.
 
   with(as.list(c(parms,x)),{
-    dSw <- d*(Sw+Iw+Rw)+g*Iw - beta*(1-p)*Sw*Iw - beta*p*Sw*In - d*Sw - fw*Sw #szuletes = halal, ezert a halalt parameterezem csak
-    # d*sig+gi a total szuletesszam, ds a S-ek halala
-    dSn <- d*(Sn+In+Rn)+g*In - beta*(1-p)*Sn*In - beta*p*Sn*Iw - d*Sn - fn*Sn
-    # dS <- (d*(Sw+Iw+Rw)+g*Iw - beta*(1-p)*Sw*Iw - beta*p*Sw*In - d*Sw - fw*Sw) + 
-      # (d*(Sn+In+Rn)+g*In - beta*(1-p)*Sn*In - beta*p*Sn*Iw - d*Sn - fn*Sn)
-    dIw <- + beta*(1-p)*Sw*Iw + beta*p*Sw*In - r*Iw - d*Iw -g*Iw
-    #dI a sima halalozasi rataval halo I-k, g*I amennyivel jobban meghalnak az I-k
-    dIn <- + beta*(1-p)*Sn*In + beta*p*Sn*Iw - r*In - d*In -g*In
-    # dI <- (+ beta*(1-p)*Sw*Iw + beta*p*Sw*In - r*Iw - d*Iw -g*Iw) +
-      # (+ beta*(1-p)*Sn*In + beta*p*Sn*Iw - r*In - d*In -g*In)
-    dRw <- r*Iw - d*Rw + fw*Sw        # Note: because S+I+R=constant, this equation could actually be omitted,
+    dSw <- d*(Sw+Iw+Rw)+g*Iw - beta*Sw*Iw - beta*p*Sw*In - d*Sw - ffw*Sw
+   
+    dSn <- d*(Sn+In+Rn)+g*In - beta*Sn*In - beta*p*Sn*Iw - d*Sn - ffn*Sn
+
+    dIw <- + beta*Sw*Iw + beta*p*Sw*In - r*Iw - d*Iw -g*Iw
+
+    dIn <- + beta*Sn*In + beta*p*Sn*Iw - r*In - d*In -g*In
+
+    dRw <- r*Iw - d*Rw + ffw*Sw        # Note: because S+I+R=constant, this equation could actually be omitted,
                   # and R at any time point could simply be calculated as N-S-I.
-    dRn <- r*In - d*Rn + fn*Sn
-    # dR <- (r*Iw - d*Rw + fw*Sw) +
-      # (r*In - d*Rn + fn*Sn)
-    der <- c(dSw, dSn, 
-             # dS , 
-             dIw, dIn, 
-             # dI, 
-             dRw, dRn # , 
-             # dR
+    dRn <- r*In - d*Rn + ffn*Sn
+
+    der <- c(dSn, dSw, 
+
+             dIn, dIw, 
+
+             dRn, dRw
              )
     list(der)  # the output must be returned    
   }) # end of 'with'
@@ -73,31 +69,29 @@ SIR <- function(t, x, parms){
 ### LOAD LIBRARIES
 #load R library for ordinary differential equation solvers
 library(deSolve)
+pdf("sir_antivaxx_birthdeath.pdf")
 # R0_vektor = vector(mode="list") #ez lesz amiben az R0-okat tárolom
 ### INITIALIZE PARAMETER SETTINGS
-for (v in 1:6) {
-  for (w in 1:6) {
-    fn = 0.5 + (v-1)/10
-    fw = (w-1)/10
-    q = 0.2 # Waldorfosok aránya a popuban
-    p = 0.3 # a valószínűség, hogy akivel találkozol, nem olyan, mint te
+for (w in 1:21) {
+  for(j in 1:11){
+    fn = 0.85
+    fw = 0.85
+    q = (w-1)/20 # Waldorfosok aránya a popuban
+    p = (j-1)/10 # a valószínűség, hogy akivel találkozol, nem olyan, mint te
     f = q*fw + (1-q)*fn
     index = f*100
     S0 = 499
-    parms <- c(beta=1e-2, r=1e-1, d=0.1, g=2, fw=fw, fn=fn, q=q, p=p)		# set the parameters of the model
+    parms <- c(beta=1e-2, r=1e-1, d=0.1, g=0.5, ffw=0, ffn=fn, q=q, p=p)		# set the parameters of the model
     inits <- c(Sn=(1-q)*(1-fn)*S0, 
                Sw=q*(1-fw)*S0, 
-               # S=((1-q)*(1-fn)*S0) +  (q*(1-fw)*S0),
-               In=(1-q), 
-               Iw=q, 
-               # I=1,
+               In=(1-q),
+               Iw=q,
                Rn=(1-q)*fn*S0, 
-               Rw=q*fw*S0 # ,
-               # R=((1-q)*fn*S0) + (q*fw*S0)
+               Rw=q*fw*S0
                )
     
     # set the initial values
-    dt    <- seq(0,100,0.01)			# set the time points for evaluation
+    dt    <- seq(0,50,0.1)			# set the time points for evaluation
   
   
     # Calculate and print R_0 on the screen
@@ -121,25 +115,47 @@ for (v in 1:6) {
     # If you remove the # before pdf(...) and dev.off(), the output will be written in a pdf file,
     # in the working directory. If you don't, a window containing your graph will just pop up.
   
-    #pdf("startingscript.pdf")
+    
     #par(cex=1.7)
     # Plot S according to time, in blue, and add the graph I and R according to time,
     # in red and dark green respectively. Call help(plot) for further details.
   
     attach(simulation) # this command allows you to refer to the columns of the data frame directly.
-  
-    plot(dt, Sn, type="l", col="blue", ylim=c(0,sum(inits)), main = R_0, xlab="time", ylab="number of individuals",lwd=3)
+    par(mfrow=c(3,1))
+    plot(dt, Sn, type="l", col="blue", 
+         ylim=c(0,sum(inits)), 
+         main = (1-q), xlab="time", ylab="number of individuals",lwd=3)
     lines(dt, In, type="l", col="red",lwd=3)
     lines(dt, Rn, type="l", col="darkgreen",lwd=3)
-  
+    
+    # Add a legend to the graph
+    legend(70,400, legend=c("Sn","In","Rn"), col=c("blue", "red", "darkgreen"), lty=1,lwd=2)
+    #dev.off()
+    
+    plot(dt, Sw, type="l", col="blue", 
+         ylim=c(0, sum(inits)), 
+         main = q, xlab="time", ylab="number of individuals",lwd=3)
+    lines(dt, Iw, type="l", col="red",lwd=3)
+    lines(dt, Rw, type="l", col="darkgreen",lwd=3)
+    
+    # Add a legend to the graph
+    legend(70,400, legend=c("Sw","Iw","Rw"), col=c("blue", "red", "darkgreen"), lty=1,lwd=2)
+    #dev.off()
+    
+    plot(dt, (Sn+Sw), type="l", col="blue", 
+         ylim=c(0, sum(inits)), 
+         main = (p), sub=p, xlab="time", ylab="number of individuals",lwd=3)
+    lines(dt, (In+Iw), type="l", col="red",lwd=3)
+    lines(dt, (Rn+Rw), type="l", col="darkgreen",lwd=3)
+    
     # Add a legend to the graph
     legend(70,400, legend=c("S","I","R"), col=c("blue", "red", "darkgreen"), lty=1,lwd=2)
-    #dev.off()
+    
   
     detach(simulation) # clean up the search path
-  
-  }
-}  
+  }  
+}
+dev.off()
 # print(R0_vektor)
 # volte = FALSE #ebben tarolom, hogy van-e olyan oltottsag, ami megelozi a jarvanyt
 # for (a in 1:length(R0_vektor)) {
