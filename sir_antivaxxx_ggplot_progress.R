@@ -69,7 +69,8 @@ SIR <- function(t, x, parms){
 ### LOAD LIBRARIES
 #load R library for ordinary differential equation solvers
 library(deSolve)
-pdf("sir_antivaxx_birthdeath.pdf")
+library(ggplot2)
+# pdf("sir_antivaxx_birthdeath_gg.pdf")
 ### INITIALIZE PARAMETER SETTINGS
 for (w in 1:21) {
   for(j in 1:11){
@@ -115,38 +116,188 @@ for (w in 1:21) {
     # in red and dark green respectively. Call help(plot) for further details.
   
     attach(simulation) # this command allows you to refer to the columns of the data frame directly.
-    par(mfrow=c(3,1))
-    plot(dt, Sn, type="l", col="blue", 
-         ylim=c(0,sum(inits)), 
-         main = (1-q), xlab="time", ylab="number of individuals",lwd=3)
-    lines(dt, In, type="l", col="red",lwd=3)
-    lines(dt, Rn, type="l", col="darkgreen",lwd=3)
     
-    # Add a legend to the graph
-    legend(70,400, legend=c("Sn","In","Rn"), col=c("blue", "red", "darkgreen"), lty=1,lwd=2)
-    #dev.off()
+    #itt ?rom be, hogy ki?rja nekem a beta-kat meg r-eket is a plotra
+    #ITT ADOM MEG A TITLE-T!!! meg a subtitle-t
+    title = paste("Normálisak")
+    ffn = parms[6]
+    arany = paste("arány: ",(1-q), sep = "")
+    kev = paste("keveredés: ",p,sep = "")
+    oltotts = paste("eredeti oltottság: ", fn, sep = "")
+    rata = paste("oltási ráta: ", ffn, sep = "")
+    subtitle = paste(arany,kev,oltotts, rata, sep = ", ")
+    #^^Teh?t ez a r?sz itt csak annyi volt, hogy megadtam neki milyen sz?veg mell? mely ?rt?keket kell irogatnia
+    #a for ciklusban. Pl hogy a beta az a parms elso parm?tere, amit ?gy ?rjon ki nekem hogy "beta = az ?rt?ke" ?s
+    #hogy ezt hogy v?lassza el. Vagyishogy n?lam sehogy: ""
+    #Azt?n ugyanezt erre is megcsin?ltam
+    #Majd csin?ltam nekik subtitle v?ltoz?t, amit meg vesszovel v?lasszon el
     
-    plot(dt, Sw, type="l", col="blue", 
-         ylim=c(0, sum(inits)), 
-         main = q, xlab="time", ylab="number of individuals",lwd=3)
-    lines(dt, Iw, type="l", col="red",lwd=3)
-    lines(dt, Rw, type="l", col="darkgreen",lwd=3)
+    #plot script
+    p_norm = ggplot(simulation, aes(x = time)) + #simulation a data ugye
+      geom_line(aes(y = Sn, colour = "Susceptible"), size=3, alpha=0.45) + #egy vonal beh?z?sa S-re, a sz?nn?l meg
+      #azt adom meg, amit alul defini?lok a colorban, ami a legendet csin?lja, vagyis Susceptible. 
+      #Amit ott be?rsz a sz?n mell?, azt a sz?veget jelen?ti meg a sz?n mell?
+      #a size az a vonal vastags?ga, az alpha meg, hogy mennyire legyen ?tl?tsz?
+      geom_line(aes(y = In, colour = "Infected"), size=3.1, alpha=0.45) + 
+      geom_line(aes(y = Rn, colour = "Recovered"), size=3.2, alpha=0.45) +
+      # ylim(0, NA) +
+      ylab(label="Number of individuals") + #x tengely felirata
+      xlab("Time") + #y tengely felirata
+      ggtitle(title, subtitle = subtitle) + #ebben mondod meg, hogy mi legyen a title meg a subtitle
+      #de ha ugyanazokat az elnevez?seket haszn?lod, mint ?n ?s csak ott ?tirogatod a dolgokat, akkor ehhez nem kell
+      #hozz?ny?lnod
+      scale_color_manual(name = " ",
+                         values = c("Susceptible" = "turquoise4", "Infected" = "tomato3", "Recovered" = "goldenrod2")) +
+      #itt add meg, hogy melyik vonalad milyen sz?nu legyen, ?s hogy h?vj?k azt a v?ltoz?t. De szerintem ezt is meg-
+      #tarthatod, hogy k?vetheto legyen ?s mindig ugyanolyan legyen mindennek a sz?ne
+      #INNENTOL LESZAROD A K?DOT!!! NEKED NEM KELL!! EZT ?GY HAGYOD!!!! itt mindenf?le h?tt?rsz?nez?st meg
+      #form?z?st adok meg, amitol csill?mp?ni sz?p lesz az eg?sz, de ez mindenhol UGYANAZ!!!
+      theme(plot.background = element_rect(fill = "antiquewhite4"),
+            legend.background = element_rect(fill = "antiquewhite4"),
+            plot.title = element_text(size = 18, lineheight=.8, hjust=0.5, face="bold", colour="antiquewhite"),
+            plot.subtitle = element_text(size = 16, lineheight=.8, hjust=0.5, face="italic", colour="antiquewhite"),
+            axis.title = element_text(size = 15, face="bold",colour="antiquewhite"),
+            axis.text = element_text(size = 12,colour="antiquewhite"),
+            legend.position="top",
+            legend.key = element_rect(fill = "seashell"),
+            legend.text = element_text(size = 12,colour="antiquewhite"),
+            legend.box.background = element_rect(colour = "antiquewhite", size=1.5),
+            panel.background = element_rect(fill = "seashell", colour = "seashell", size = 0.5, linetype = "solid"),
+            panel.grid.major = element_line(size = 0.5, linetype = 'solid', colour = "antiquewhite"), 
+            panel.grid.minor = element_line(size = 0.25, linetype = 'solid', colour = "antiquewhite"))
+    print(p_norm)
     
-    # Add a legend to the graph
-    legend(70,400, legend=c("Sw","Iw","Rw"), col=c("blue", "red", "darkgreen"), lty=1,lwd=2)
-    #dev.off()
+    #itt ?rom be, hogy ki?rja nekem a beta-kat meg r-eket is a plotra
+    #ITT ADOM MEG A TITLE-T!!! meg a subtitle-t
+    title = paste("Antivaxxerek")
+    ffw = parms[5]
+    arany = paste("arány: ",q, sep = "")
+    kev = paste("keveredés: ",p,sep = "")
+    oltotts = paste("eredeti oltottság: ", fw, sep = "")
+    rata = paste("oltási ráta: ", ffw, sep = "")
+    subtitle = paste(arany,kev,oltotts, rata, sep = ", ")
+    #^^Teh?t ez a r?sz itt csak annyi volt, hogy megadtam neki milyen sz?veg mell? mely ?rt?keket kell irogatnia
+    #a for ciklusban. Pl hogy a beta az a parms elso parm?tere, amit ?gy ?rjon ki nekem hogy "beta = az ?rt?ke" ?s
+    #hogy ezt hogy v?lassza el. Vagyishogy n?lam sehogy: ""
+    #Azt?n ugyanezt erre is megcsin?ltam
+    #Majd csin?ltam nekik subtitle v?ltoz?t, amit meg vesszovel v?lasszon el
     
-    plot(dt, (Sn+Sw), type="l", col="blue", 
-         ylim=c(0, sum(inits)), 
-         main = (p), sub=p, xlab="time", ylab="number of individuals",lwd=3)
-    lines(dt, (In+Iw), type="l", col="red",lwd=3)
-    lines(dt, (Rn+Rw), type="l", col="darkgreen",lwd=3)
+    #plot script
+    p_wald = ggplot(simulation, aes(x = time)) + #simulation a data ugye
+      geom_line(aes(y = Sw, colour = "Susceptible"), size=3, alpha=0.45) + #egy vonal beh?z?sa S-re, a sz?nn?l meg
+      #azt adom meg, amit alul defini?lok a colorban, ami a legendet csin?lja, vagyis Susceptible. 
+      #Amit ott be?rsz a sz?n mell?, azt a sz?veget jelen?ti meg a sz?n mell?
+      #a size az a vonal vastags?ga, az alpha meg, hogy mennyire legyen ?tl?tsz?
+      geom_line(aes(y = Iw, colour = "Infected"), size=3.1, alpha=0.45) + 
+      geom_line(aes(y = Rw, colour = "Recovered"), size=3.2, alpha=0.45) +
+      # ylim(0, NA) +
+      ylab(label="Number of individuals") + #x tengely felirata
+      xlab("Time") + #y tengely felirata
+      ggtitle(title, subtitle = subtitle) + #ebben mondod meg, hogy mi legyen a title meg a subtitle
+      #de ha ugyanazokat az elnevez?seket haszn?lod, mint ?n ?s csak ott ?tirogatod a dolgokat, akkor ehhez nem kell
+      #hozz?ny?lnod
+      scale_color_manual(name = " ",
+                         values = c("Susceptible" = "turquoise4", "Infected" = "tomato3", "Recovered" = "goldenrod2")) +
+      #itt add meg, hogy melyik vonalad milyen sz?nu legyen, ?s hogy h?vj?k azt a v?ltoz?t. De szerintem ezt is meg-
+      #tarthatod, hogy k?vetheto legyen ?s mindig ugyanolyan legyen mindennek a sz?ne
+      #INNENTOL LESZAROD A K?DOT!!! NEKED NEM KELL!! EZT ?GY HAGYOD!!!! itt mindenf?le h?tt?rsz?nez?st meg
+      #form?z?st adok meg, amitol csill?mp?ni sz?p lesz az eg?sz, de ez mindenhol UGYANAZ!!!
+      theme(plot.background = element_rect(fill = "antiquewhite4"),
+            legend.background = element_rect(fill = "antiquewhite4"),
+            plot.title = element_text(size = 18, lineheight=.8, hjust=0.5, face="bold", colour="antiquewhite"),
+            plot.subtitle = element_text(size = 16, lineheight=.8, hjust=0.5, face="italic", colour="antiquewhite"),
+            axis.title = element_text(size = 15, face="bold",colour="antiquewhite"),
+            axis.text = element_text(size = 12,colour="antiquewhite"),
+            legend.position="top",
+            legend.key = element_rect(fill = "seashell"),
+            legend.text = element_text(size = 12,colour="antiquewhite"),
+            legend.box.background = element_rect(colour = "antiquewhite", size=1.5),
+            panel.background = element_rect(fill = "seashell", colour = "seashell", size = 0.5, linetype = "solid"),
+            panel.grid.major = element_line(size = 0.5, linetype = 'solid', colour = "antiquewhite"), 
+            panel.grid.minor = element_line(size = 0.25, linetype = 'solid', colour = "antiquewhite"))
+    print(p_wald)
     
-    # Add a legend to the graph
-    legend(70,400, legend=c("S","I","R"), col=c("blue", "red", "darkgreen"), lty=1,lwd=2)
+    #itt ?rom be, hogy ki?rja nekem a beta-kat meg r-eket is a plotra
+    #ITT ADOM MEG A TITLE-T!!! meg a subtitle-t
+    title = paste("Teljes populáció")
+    arany = paste("Antiwaxxerek aránya arány: ",q, sep = "")
+    kev = paste("keveredés: ",p,sep = "")
+    oltotts = paste("eredeti oltottság: ", fw, sep = "")
+    subtitle = paste(arany,kev,oltotts, sep = ", ")
+    #^^Teh?t ez a r?sz itt csak annyi volt, hogy megadtam neki milyen sz?veg mell? mely ?rt?keket kell irogatnia
+    #a for ciklusban. Pl hogy a beta az a parms elso parm?tere, amit ?gy ?rjon ki nekem hogy "beta = az ?rt?ke" ?s
+    #hogy ezt hogy v?lassza el. Vagyishogy n?lam sehogy: ""
+    #Azt?n ugyanezt erre is megcsin?ltam
+    #Majd csin?ltam nekik subtitle v?ltoz?t, amit meg vesszovel v?lasszon el
     
-  
-    detach(simulation) # clean up the search path
+    #plot script
+    p_popu = ggplot(simulation, aes(x = time)) + #simulation a data ugye
+      geom_line(aes(y = (Sn+Sw), colour = "Susceptible"), size=3, alpha=0.45) + #egy vonal beh?z?sa S-re, a sz?nn?l meg
+      #azt adom meg, amit alul defini?lok a colorban, ami a legendet csin?lja, vagyis Susceptible. 
+      #Amit ott be?rsz a sz?n mell?, azt a sz?veget jelen?ti meg a sz?n mell?
+      #a size az a vonal vastags?ga, az alpha meg, hogy mennyire legyen ?tl?tsz?
+      geom_line(aes(y = (In+Iw), colour = "Infected"), size=3.1, alpha=0.45) + 
+      geom_line(aes(y = (Rn+Rw), colour = "Recovered"), size=3.2, alpha=0.45) +
+      # ylim(0, NA) +
+      ylab(label="Number of individuals") + #x tengely felirata
+      xlab("Time") + #y tengely felirata
+      ggtitle(title, subtitle = subtitle) + #ebben mondod meg, hogy mi legyen a title meg a subtitle
+      #de ha ugyanazokat az elnevez?seket haszn?lod, mint ?n ?s csak ott ?tirogatod a dolgokat, akkor ehhez nem kell
+      #hozz?ny?lnod
+      scale_color_manual(name = " ",
+                         values = c("Susceptible" = "turquoise4", "Infected" = "tomato3", "Recovered" = "goldenrod2")) +
+      #itt add meg, hogy melyik vonalad milyen sz?nu legyen, ?s hogy h?vj?k azt a v?ltoz?t. De szerintem ezt is meg-
+      #tarthatod, hogy k?vetheto legyen ?s mindig ugyanolyan legyen mindennek a sz?ne
+      #INNENTOL LESZAROD A K?DOT!!! NEKED NEM KELL!! EZT ?GY HAGYOD!!!! itt mindenf?le h?tt?rsz?nez?st meg
+      #form?z?st adok meg, amitol csill?mp?ni sz?p lesz az eg?sz, de ez mindenhol UGYANAZ!!!
+      theme(plot.background = element_rect(fill = "antiquewhite4"),
+            legend.background = element_rect(fill = "antiquewhite4"),
+            plot.title = element_text(size = 18, lineheight=.8, hjust=0.5, face="bold", colour="antiquewhite"),
+            plot.subtitle = element_text(size = 16, lineheight=.8, hjust=0.5, face="italic", colour="antiquewhite"),
+            axis.title = element_text(size = 15, face="bold",colour="antiquewhite"),
+            axis.text = element_text(size = 12,colour="antiquewhite"),
+            legend.position="top",
+            legend.key = element_rect(fill = "seashell"),
+            legend.text = element_text(size = 12,colour="antiquewhite"),
+            legend.box.background = element_rect(colour = "antiquewhite", size=1.5),
+            panel.background = element_rect(fill = "seashell", colour = "seashell", size = 0.5, linetype = "solid"),
+            panel.grid.major = element_line(size = 0.5, linetype = 'solid', colour = "antiquewhite"), 
+            panel.grid.minor = element_line(size = 0.25, linetype = 'solid', colour = "antiquewhite"))
+    print(p_popu)
+    
+    
+   #  par(mfrow=c(3,1))
+   #  plot(dt, Sn, type="l", col="blue", 
+   #       ylim=c(0,sum(inits)), 
+   #       main = (1-q), xlab="time", ylab="number of individuals",lwd=3)
+   #  lines(dt, In, type="l", col="red",lwd=3)
+   #  lines(dt, Rn, type="l", col="darkgreen",lwd=3)
+   #  
+   #  # Add a legend to the graph
+   #  legend(70,400, legend=c("Sn","In","Rn"), col=c("blue", "red", "darkgreen"), lty=1,lwd=2)
+   #  #dev.off()
+   #  
+   #  plot(dt, Sw, type="l", col="blue", 
+   #       ylim=c(0, sum(inits)), 
+   #       main = q, xlab="time", ylab="number of individuals",lwd=3)
+   #  lines(dt, Iw, type="l", col="red",lwd=3)
+   #  lines(dt, Rw, type="l", col="darkgreen",lwd=3)
+   #  
+   #  # Add a legend to the graph
+   #  legend(70,400, legend=c("Sw","Iw","Rw"), col=c("blue", "red", "darkgreen"), lty=1,lwd=2)
+   #  #dev.off()
+   #  
+   #  plot(dt, (Sn+Sw), type="l", col="blue", 
+   #       ylim=c(0, sum(inits)), 
+   #       main = (p), sub=p, xlab="time", ylab="number of individuals",lwd=3)
+   #  lines(dt, (In+Iw), type="l", col="red",lwd=3)
+   #  lines(dt, (Rn+Rw), type="l", col="darkgreen",lwd=3)
+   #  
+   #  # Add a legend to the graph
+   #  legend(70,400, legend=c("S","I","R"), col=c("blue", "red", "darkgreen"), lty=1,lwd=2)
+   #  
+  # 
+   detach(simulation) # clean up the search path
   }  
 }
-dev.off()
+# dev.off()
